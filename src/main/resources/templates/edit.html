@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Редактирование пользователя</title>
+</head>
+<body>
+<h1>Редактирование пользователя</h1>
+<form action="/admin/update" method="post">
+  <label for="name">Имя: </label> <input type="text" name="name" id="name" th:value="${user.name}" required placeholder="Имя" /><br />
+  <label for="lastname">Фамилия: </label><input type="text" name="lastname" id="lastname" th:value="${user.lastname}" required placeholder="Фамилия" /><br />
+  <label for="email">email: </label><input type="text" name="email" id="email" th:value="${user.email}" required placeholder="Почта" /><br />
+  <label for="username">Логин: </label><input type="text" name="username" id="username" th:value="${user.username}" required placeholder="Логин" /><br />
+  <label for="password">Новый пароль: </label><input type="text" name="password" id="password" required placeholder="Пароль" />
+  <input type="hidden" name="id" id="id" th:value="${user.id}"  />
+  <br />
+  <input type="submit" name="submit">
+</form>
+
+</body>
+</html>
