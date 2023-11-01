@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
-import java.util.List;
+import java.util.Set;
+
+
 @Controller
 public class AdminController {
     private final UserService userService;
@@ -19,7 +21,8 @@ public class AdminController {
 
     @GetMapping(value = "/admin")
     public String getUsersForm(ModelMap model) {
-        List<User> users = userService.getAllUsers();
+
+        Set<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
         return "admin";
     }
@@ -28,6 +31,7 @@ public class AdminController {
     public String newUserForm(ModelMap model) {
         return "add";
     }
+
     @PostMapping("admin/new")
     public String newUserForm(@ModelAttribute("user") User user, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
@@ -38,19 +42,20 @@ public class AdminController {
     }
 
     @PostMapping("/admin/edit")
-    public String editUserForm(ModelMap model,@RequestParam Long id) {
+    public String editUserForm(ModelMap model, @RequestParam Long id) {
         User user = userService.getUser(id);
         model.put("user", user);
         return "edit";
     }
-    @PostMapping ("/admin/update")
+
+    @PostMapping("/admin/update")
     public String updateUserForm(@ModelAttribute("user") User user) {
         userService.updateUser(user);
         return "redirect:/admin";
     }
 
     @PostMapping("/admin/delete")
-    public String deleteUserForm(@RequestParam (required = true, defaultValue = "") Long id) {
+    public String deleteUserForm(@RequestParam(required = true, defaultValue = "") Long id) {
         userService.deleteUser(id);
         return "redirect:/admin";
     }
