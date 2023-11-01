@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.User;
 
-import java.util.List;
+import java.util.Set;
+
 @Repository
 public interface UserDao extends UserDetailsService {
     @Transactional
@@ -16,7 +17,7 @@ public interface UserDao extends UserDetailsService {
     @Transactional
     void deleteUser(Long id);
 
-    List<User> getAllUsers();
+    Set<User> getAllUsers();
 
     @Transactional
     void updateUser(User user);

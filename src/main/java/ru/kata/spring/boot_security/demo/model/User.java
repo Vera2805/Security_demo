@@ -1,11 +1,15 @@
 package ru.kata.spring.boot_security.demo.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -24,15 +28,25 @@ public class User implements UserDetails {
 
     @Column(name = "password")
     private String password;
+
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles;
+    private Collection<Role> roles;
 
     public User() {
+    }
+
+    public User(String name, String lastname, String email, String username, String password) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.name = name;
+        this.lastname = lastname;
     }
 
     public User(Long id) {
         this.id = id;
     }
+
     public Long getId() {
         return id;
     }
@@ -40,6 +54,7 @@ public class User implements UserDetails {
     public void setId(Long id) {
         this.id = id;
     }
+
     public String getEmail() {
         return email;
     }
@@ -63,6 +78,7 @@ public class User implements UserDetails {
     public void setName(String name) {
         this.name = name;
     }
+
     @Override
     public String getUsername() {
         return username;
@@ -71,24 +87,24 @@ public class User implements UserDetails {
     public void setUsername(String username) {
         this.username = username;
     }
+
     @Override
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
-    public List<Role> getRoles() {
-        return roles;
-    }
 
-    public void setRoles(List<Role> roles) {
+
+    public void setRoles(Collection<Role> roles) {
         this.roles = roles;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
+        return roles;
     }
 
     @Override
