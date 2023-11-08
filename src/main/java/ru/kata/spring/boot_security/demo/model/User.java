@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-
+import java.util.Set;
 @Getter
 @Setter
 @Entity
@@ -29,12 +29,16 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<Role> roles;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable (name = "user_role",
+    joinColumns = @JoinColumn (name = "user_id"),
+    inverseJoinColumns = @JoinColumn (name = "role_id"))
+
+
+    private Set<Role> roles;
 
     public User() {
     }
-
     public User(String name, String lastname, String email, String username, String password) {
         this.username = username;
         this.password = password;
@@ -42,11 +46,9 @@ public class User implements UserDetails {
         this.name = name;
         this.lastname = lastname;
     }
-
     public User(Long id) {
         this.id = id;
     }
-
     public Long getId() {
         return id;
     }
@@ -54,7 +56,6 @@ public class User implements UserDetails {
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getEmail() {
         return email;
     }
@@ -78,7 +79,6 @@ public class User implements UserDetails {
     public void setName(String name) {
         this.name = name;
     }
-
     @Override
     public String getUsername() {
         return username;
@@ -87,18 +87,16 @@ public class User implements UserDetails {
     public void setUsername(String username) {
         this.username = username;
     }
-
     @Override
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
 
 
-    public void setRoles(Collection<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 

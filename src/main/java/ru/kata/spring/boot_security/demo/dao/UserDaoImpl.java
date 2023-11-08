@@ -1,33 +1,35 @@
 package ru.kata.spring.boot_security.demo.dao;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-@Service
-@Transactional(readOnly = true)
+
 public class UserDaoImpl implements UserDao {
     @PersistenceContext
     private EntityManager entityManager;
 
 
     @Override
-    @Transactional
     public void addUser(User user) {
 
         entityManager.persist(user);
     }
 
     @Override
-    @Transactional
     public void deleteUser(Long id) {
         User user = getUser(id);
         entityManager.remove(user);
@@ -36,11 +38,10 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Set<User> getAllUsers() {
         Set<User> AllUsers = new HashSet<User>(entityManager.createQuery("select u from User u", User.class).getResultList());
-        return AllUsers;
+        return AllUsers ;
     }
 
     @Override
-    @Transactional
     public void updateUser(User user) {
         user.setRoles(getUser(user.getId()).getRoles());
         entityManager.merge(user);

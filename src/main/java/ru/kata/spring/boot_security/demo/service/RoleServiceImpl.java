@@ -11,8 +11,7 @@ import java.util.Set;
 public class RoleServiceImpl implements RoleService {
     private final RoleDao roleRepo;
 
-    @Autowired
-    public RoleServiceImpl(RoleDao roleRepo) {
+    public RoleServiceImpl (RoleDao roleRepo) {
         this.roleRepo = roleRepo;
     }
 
@@ -21,21 +20,19 @@ public class RoleServiceImpl implements RoleService {
         return roleRepo.indexRoles();
 
     }
-
     @Override
-    public Role getRole(String roleName) {
+    public Role getRole (String roleName) {
         return roleRepo.getRole(roleName);
     }
-
     @Override
-    public Role getRoleById(int id) {
+    public Role getRoleById (int id) {
         return roleRepo.getRoleById(id);
     }
-
     @Override
-    public void addRole(Role role) {
+    public void addRole (Role role) {
         roleRepo.addRole(role);
     }
+
 
     @Override
     public Set<Role> getRolesByIds(Set<Integer> roleIds) {
