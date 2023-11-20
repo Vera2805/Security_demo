@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Пользователи</title>
+    <style>
+
+        #cssTable td
+        {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+
+    </style>
+</head>
+<body>
+<h1>Пользователи</h1>
+<button onclick="window.location.href = '/admin/new';">добавить</button>
+<br>
+<br>
+<table border="1" id="cssTable">
+    <tr>
+        <th th:>Id</th>
+        <th th:>Имя</th>
+        <th th:>Фамилия</th>
+        <th th:>Почта</th>
+        <th th:>Логин</th>
+        <th th:>Пароль</th>
+        <th th:>Роль</th>
+        <th th:>Редактировать</th>
+        <th th:>Удалить</th>
+    </tr>
+    <tr th:each="user : ${users}">
+
+        <td><a th:href="@{'/admin/' + ${user.userId}}" th:utext="${user.userId}">UserId</a></td>
+        <td th:utext="${user.name}">Имя</td>
+        <td th:utext="${user.lastname}">Фамилия</td>
+        <td th:utext="${user.email}">Почта</td>
+        <td th:utext="${user.username}">Логин</td>
+        <td th:utext="${user.password}">Пароль</td>
+        <td>
+            <th:block th:each="role: ${user.roles}"
+                      th:text="${role.getRoleName().replace('ROLE_', ' ')}">Роль
+            </th:block>
+        </td>
+        <td>
+
+                <input type="submit" class="buttonEdit" value="Редактировать"/>
+            </form>
+        </td>
+        <td>
+            <form th:method="DELETE" th:action="@{'/admin/delete/' + ${user.userId}}">
+                <input type="submit" class="buttonDelete" value="Удалить"/>
+            </form>
+        </td>
+    </tr>
+</table>
+<br>
+<form th:action="@{/logout}">
+    <input type="submit" value="Logout"/>
+</form>
+</br>
+</body>
+</html>

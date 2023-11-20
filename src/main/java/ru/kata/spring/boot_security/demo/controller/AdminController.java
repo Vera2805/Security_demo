@@ -1,67 +1,139 @@
 package ru.kata.spring.boot_security.demo.controller;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.model.Role;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
+import ru.kata.spring.boot_security.demo.model.User;
 
-import java.util.ArrayList;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
+@Valid
+@RequestMapping("/admin")
 public class AdminController {
-    private final UserService userService;
 
-    public AdminController(UserService userService) {
+    private final RoleService roleService;
+    private final UserService userService;
+    private static final String REDIRECT = "redirect:/admin";
+
+
+    @Autowired
+    public AdminController(RoleService roleService, UserService userService) {
+        this.roleService = roleService;
         this.userService = userService;
     }
 
-    @GetMapping(value = "/admin")
-    public String getUsersForm(ModelMap model) {
-
-        Set<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
-        return "admin";
+    @GetMapping(value = "")
+    public String getAllUsers(Model model) {
+        model.addAttribute("users", userService.getAllUsers());
+        return "users";
     }
 
-    @RequestMapping("admin/add")
-    public String newUserForm(ModelMap model) {
-        return "add";
+    @GetMapping(value = "/{id}")
+    public String getUserById(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("user", userService.getUserById(id));
+        return "user";
     }
-    @PostMapping("admin/new")
-    public String newUserForm(@ModelAttribute("user") User user, BindingResult bindingResult, Model model) {
+
+    @GetMapping(value = "/new")
+    public String addUser(Model model) {
+        model.addAttribute("user", new  User());
+        model.addAttribute("allRoles", roleService.getAllRoles());
+        return "make";
+    }
+
+    @PostMapping(value = "/new")
+    public String add(@Valid @ModelAttribute("user") User user, BindingResult bindingResult
+            , Model model, @RequestParam(value = "ids", required = false) List<Long> ids) {
         if (bindingResult.hasErrors()) {
-            return "add";
+
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            Set<Role> assignedRole = roleService.findAllRoleId(ids);
+            user.setRoles(assignedRole);
+
+            return "make";
         }
-        userService.addUser(user);
-        return "redirect:/admin";
+
+        if ( ids == null || ids.isEmpty()) {
+            bindingResult.rejectValue("roles", "error.roles.empty", "No roles selected");
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            Set<Role> assignedRole = roleService.findAllRoleId(ids);
+            user.setRoles(assignedRole);
+            return "make";
+        }
+
+        try {
+
+            Set<Role> assignedRole = roleService.findAllRoleId(ids);
+            user.setRoles(assignedRole);
+            userService.addUser(user);
+            return REDIRECT;
+        } catch (DataIntegrityViolationException e) {
+            bindingResult.rejectValue("username", "duplicate", "This is username is already taken");
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            Set<Role> assignedRole = roleService.findAllRoleId(ids);
+            user.setRoles(assignedRole);
+            return "make";
+        }
+
     }
 
-    @PostMapping("/admin/edit")
-    public String editUserForm(ModelMap model,@RequestParam Long id) {
-        User user = userService.getUser(id);
-        model.put("user", user);
+    @DeleteMapping(value = "/delete/{id}")
+    public String delete(@PathVariable("id") Long id) {
+        userService.removeUser(id);
+        return REDIRECT;
+    }
+
+    @GetMapping(value = "/edit/{id}")
+    public String updateUser(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("user", userService.getUserById(id));
+        model.addAttribute("allRoles", roleService.getAllRoles());
         return "edit";
     }
-    @PostMapping ("/admin/update")
-    public String updateUserForm(@ModelAttribute("user") User user) {
-        userService.updateUser(user);
-        return "redirect:/admin";
-    }
 
-    @PostMapping("/admin/delete")
-    public String deleteUserForm(@RequestParam (required = true, defaultValue = "") Long id) {
-        userService.deleteUser(id);
-        return "redirect:/admin";
+    @PatchMapping(value = "/edit")
+    public String update(@Valid @ModelAttribute("user") User user, BindingResult bindingResult
+            , Model model, @RequestParam(value = "ids", required = false) List<Long> ids) {
+        if (bindingResult.hasErrors()) {
+
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            Set<Role> assignedRole = roleService.findAllRoleId(ids);
+            user.setRoles(assignedRole);
+
+            return "edit";
+        }
+
+        if (ids == null || ids.isEmpty()) {
+            bindingResult.rejectValue("roles", "errors","No roles selected");
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            Set<Role> assignedRole = roleService.findAllRoleId(ids);
+            user.setRoles(assignedRole);
+            return "edit";
+        }
+
+        try {
+            Set<Role> assignedRole = roleService.findAllRoleId(ids);
+            user.setRoles(assignedRole);
+            userService.updateUser(user);
+            return REDIRECT;
+        } catch (DataIntegrityViolationException e) {
+            bindingResult.
+
+
+            rejectValue("username", "duplicate", "This is username is already taken");
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            Set<Role> assignedRole = roleService.findAllRoleId(ids);
+            user.setRoles(assignedRole);
+            return "edit";
+        }
     }
 }
-
-
-
-
-

@@ -1,18 +1,26 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-<head>
-    <title>Проект Spring Security</title>
-</head>
-<body>
-<div sec:authorize="isAuthenticated()">
-    <p>Username: <span sec:authentication="name"></span></p>
-    <a href="/logout">Выйти</a>
-</div>
-<h1>Страница пользователя</h1>
 
-<h1 th:inline="text">username: [[${#httpServletRequest.remoteUser}]]</h1>
-<br />
-<h2><a href="/">На главную</a></h2>
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+            <head>
+                <meta charset="UTF-8"/>
+                <title>Пользователь</title>
 
-</body>
-</html>
+            </head>
+            <body>
+            <h1>Пользователь</h1>
+            <table border="1" id="cssTable" th:name="id">
+
+                <td th:utext="${user.userId}">Id</td>
+                <td th:utext="${user.name}">Имя</td>
+                <td th:utext="${user.lastname}">Фамилия</td>
+                <td th:utext="${user.email}">Почта</td>
+                <td th:utext="${user.username}">Логин</td>
+                <td th:utext="${user.password}">Пароль</td>
+                <td th:each="role: ${user.getRoles()}" th:utext="${role.roleName}">Роль</td>
+
+            </table>
+
+            <br>
+            <button onclick="window.location.href = '/logout'; ">выйти</button>
+            </body>
+            </html>

@@ -1,22 +1,23 @@
 package ru.kata.spring.boot_security.demo.model;
 
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
-@Getter
-@Setter
+
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "user_id")
+
+    private Long userId;
     @Column(name = "name")
     private String name;
     @Column(name = "lastname")
@@ -33,28 +34,26 @@ public class User implements UserDetails {
     @JoinTable (name = "user_role",
     joinColumns = @JoinColumn (name = "user_id"),
     inverseJoinColumns = @JoinColumn (name = "role_id"))
+    private Set<Role> roles = new HashSet<>() ;
 
 
-    private Set<Role> roles;
-
-    public User() {
-    }
-    public User(String name, String lastname, String email, String username, String password) {
+    public User(String name, String lastname, String email, String username, String password, Set<Role> roles) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.name = name;
         this.lastname = lastname;
+        this.roles = roles;
     }
-    public User(Long id) {
-        this.id = id;
+    public User() {
+
     }
-    public Long getId() {
-        return id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
     public String getEmail() {
         return email;
@@ -96,13 +95,17 @@ public class User implements UserDetails {
     }
 
 
+
+public Set<Role> getRoles() {
+        return roles;
+}
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        return getRoles();
     }
 
     @Override
@@ -125,7 +128,20 @@ public class User implements UserDetails {
         return true;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(userId, user.userId) && Objects.equals(name, user.name) && Objects.equals(lastname, user.lastname) && Objects.equals(email, user.email) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(roles, user.roles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, name, lastname, email, username, password, roles);
+    }
 }
+
 
 
 

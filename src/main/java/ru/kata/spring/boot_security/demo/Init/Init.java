@@ -10,13 +10,13 @@ import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.annotation.PostConstruct;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
 public class Init {
-    private final UserService userService;
-    private final RoleService roleService;
+     UserService userService;
+     RoleService roleService;
 
 
     @Autowired
@@ -28,17 +28,17 @@ public class Init {
 
     @PostConstruct
     public void initializeData() {
-        Role userRole = new Role("ROLE_USER");
-        roleService.addRole(userRole);
-        User user = new User("imya", "fam", "mail@mail.com", "q", "q");
-        user.setRoles(Collections.singleton(userRole));
-        userService.addUser(user);
+        roleService.addRole (new Role("ROLE_USER"));
+        Set<Role> userRole = new HashSet<>();
+        userRole.add(roleService.getRoleById(2L));
+        userService.addUser(new User("imya", "fam", "mail@mail.com", "q", "q", userRole));
 
-        Role adminRole = new Role("ROLE_ADMIN");
-        roleService.addRole(adminRole);
-        User admin = new User("im", "fami", "mail@mail.com", "admin", "admin");
-        admin.setRoles(Set.of(adminRole, userRole));
-        userService.addUser(admin);
+
+        roleService.addRole (new Role("ROLE_ADMIN"));
+        Set<Role> adminRole = new HashSet<>();
+        adminRole.add(roleService.getRoleById(1L));
+        userService.addUser(new User("im", "fami", "mail@mail.com", "admin", "admin", adminRole));
+
 
     }
 }
