@@ -1,11 +1,12 @@
 package ru.kata.spring.boot_security.demo.dao;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -16,31 +17,23 @@ public class RoleDaoImpl implements RoleDao {
     private EntityManager entityManager;
 
     @Override
-    public Set<Role> indexRoles() {
-        return (Set<Role>) entityManager.createQuery("select r from Role r", Role.class).getResultList();
+    public Set<Role> findAll() {
+        return (Set<Role>) entityManager.createQuery("select role from Role role", Role.class).getResultList();
     }
 
     @Override
-    public Role getRole (String roleName) {
-        return entityManager
-                .createQuery("select r from Role r where r.name =: name", Role.class)
-                .setParameter("name", roleName)
-                .getSingleResult();
+    public Set<Role> findAllId (List<Long> ids) {
+                String jpql = "select r from Role r where r.id in :ids";
+                return new HashSet<>(entityManager.createQuery(jpql, Role.class)
+                .setParameter("ids", ids)
+                .getResultList());
     }
     @Override
-    public Role getRoleById (int id) {
-        return entityManager.find(Role.class, id);
-    }
-    @Override
-    public void addRole (Role role) {
+    public void save (Role role) {
         entityManager.persist(role);
     }
     @Override
-    public Set<Role> getRolesByIds (Set <Integer> roleIds) {
-        return (Set<Role>) entityManager
-                .createQuery("select r from Role r where r.id in :ids", Role.class)
-                .setParameter("ids", roleIds)
-                .getResultList();
+    public Role getById (Long id) {
+        return entityManager.find(Role.class, id);
     }
-
 }

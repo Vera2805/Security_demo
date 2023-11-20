@@ -1,72 +1,48 @@
 package ru.kata.spring.boot_security.demo.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import ru.kata.spring.boot_security.demo.model.Role;
+import org.springframework.stereotype.Repository;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
-
+@Repository
 public class UserDaoImpl implements UserDao {
     @PersistenceContext
-    private EntityManager entityManager;
-
-
+     EntityManager entityManager;
     @Override
-    public void addUser(User user) {
 
-        entityManager.persist(user);
+    public Set<User> findAll() {
+        return (Set<User>) entityManager.createQuery("select user from User user", User.class).getResultList();
     }
 
     @Override
-    public void deleteUser(Long id) {
-        User user = getUser(id);
-        entityManager.remove(user);
-    }
-
-    @Override
-    public Set<User> getAllUsers() {
-        Set<User> AllUsers = new HashSet<User>(entityManager.createQuery("select u from User u", User.class).getResultList());
-        return AllUsers ;
-    }
-
-    @Override
-    public void updateUser(User user) {
-        user.setRoles(getUser(user.getId()).getRoles());
-        entityManager.merge(user);
-    }
-
-    @Override
-    public User getUser(Long id) {
+    public User getById(Long id) {
         return entityManager.find(User.class, id);
     }
 
     @Override
-    public String getPassword(Long id) {
-        return entityManager.find(User.class, id).getPassword();
+    public void save(User user) throws IllegalArgumentException {
+        entityManager.persist(user);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        TypedQuery<User> typedQuery = entityManager.createQuery(
-                "select u from User u where u.username = '" + username + "'", User.class
-        );
-        User user = typedQuery.getSingleResult();
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return user;
+    public void updateUser(User user) {
+        entityManager.merge(user);
     }
 
+
+
+    @Override
+    public void deleteById(Long id) {
+        entityManager.remove(getById(id));
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return entityManager.createQuery("select user from User user where user.username = : username", User.class)
+                .setParameter("username", username)
+                .setMaxResults(1).getSingleResult();
+    }
 }
